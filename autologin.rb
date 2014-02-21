@@ -4,7 +4,7 @@ require 'yaml'
 class Autologin
   def initialize
     unless File.exist?('config.yml')
-      puts "Create config.yml with:\n#{{"user" => "your user name", "password" => "your password", "browser" => :internet_explorer}.to_yaml}"
+      puts "Create config.yml with:\n#{{"user" => "your user name", "password" => "your password"}.to_yaml}"
       raise "Missing config.yml"
     end
 
