@@ -4,11 +4,15 @@ require 'yaml'
 class Autologin
   def initialize
     unless File.exist?('config.yml')
-      puts "Create config.yml with:\n#{{user: "your user name", password: "your password"}.to_yaml}"
+      puts "Create config.yml with:\n#{{"user" => "your user name", "password" => "your password", "browser" => :internet_explorer}.to_yaml}"
       raise "Missing config.yml"
     end
 
     @config = YAML.load_file('config.yml')
+
+    Capybara.register_driver :selenium do |app|
+      Capybara::Selenium::Driver.new(app, :browser => @config["browser"])
+    end
 
     @session = Capybara::Session.new(:selenium)
   end
@@ -16,8 +20,8 @@ class Autologin
   def login
     @session.visit("http://account.dyn.com/entrance")
     loginbox = @session.find("#loginbox")
-    loginbox.fill_in("username", with: @config[:user])
-    loginbox.fill_in("password", with: @config[:password])
+    loginbox.fill_in("username", with: @config["user"])
+    loginbox.fill_in("password", with: @config["password"])
     loginbox.click_button("Log in")
   end
 
