@@ -9,19 +9,28 @@ class Autologin
     end
 
     @config = YAML.load_file('config.yml')
+    @config[:browser] = :firefox unless @config[:browser]
 
     Capybara.register_driver :selenium do |app|
-      Capybara::Selenium::Driver.new(app, :browser => @config["browser"])
+      Capybara::Selenium::Driver.new(app, :browser => @config[:browser])
     end
 
     @session = Capybara::Session.new(:selenium)
   end
 
+  def fill_in loginbox, name, with
+    with.length.times do |len|
+      loginbox.fill_in(name, with: with[0..len])
+      sleep(Random.rand(0.3..1))
+    end
+  end
+
   def login
     @session.visit("http://account.dyn.com/entrance")
     loginbox = @session.find("#loginbox")
-    loginbox.fill_in("username", with: @config["user"])
-    loginbox.fill_in("password", with: @config["password"])
+    fill_in(loginbox, "username", @config[:user])
+    fill_in(loginbox, "password", @config[:password])
+    sleep(Random.rand(0.3..1))
     loginbox.click_button("Log in")
   end
 
@@ -32,6 +41,6 @@ end
 
 al = Autologin.new
 al.login
-sleep(1)
+sleep(Random.rand(0.3..1))
 al.logout
-sleep(1)
+sleep(Random.rand(0.3..1))
